@@ -20,6 +20,25 @@ class BurgerBuilder extends Component {
             cheese : 0,
         },
         totalPrice : 5,
+        purchase : false,
+    }
+
+    updatepurchaseStateHandler = (ingredients) => {
+
+        let sumofArray = Object.keys(ingredients)
+            .map(igKey => {
+                return ingredients[igKey]
+            })
+            .reduce((sum, el) => {
+                return sum + el;
+            },0);
+
+        if(sumofArray > 0){
+            this.setState({purchase : true})
+        } else {
+            this.setState({purchase : false})
+        }
+
     }
 
     addIngredientHandler = (type) => {
@@ -35,6 +54,8 @@ class BurgerBuilder extends Component {
             totalPrice : priceAddition,
             Ingredients : UpdatedIngredien
         });
+
+        this.updatepurchaseStateHandler(UpdatedIngredien);
     }
 
     removeIngredientHandler = (type) => {
@@ -47,12 +68,14 @@ class BurgerBuilder extends Component {
             ...this.state.Ingredients
         }
         UpdatedIngredien[type] = updatedCount;
-        let priceDeduction = INGREDIENT_PRICE[type] - this.state.totalPrice;
+        let priceDeduction = this.state.totalPrice - INGREDIENT_PRICE[type];
 
         this.setState({
             totalPrice : priceDeduction,
             Ingredients : UpdatedIngredien
         });
+
+        this.updatepurchaseStateHandler(UpdatedIngredien);
     }
 
     render(){
@@ -61,7 +84,7 @@ class BurgerBuilder extends Component {
         }
 
         for(let key in disableInfo){
-            if(key <= 0){
+            if(disableInfo[key] <= 0){
                 disableInfo[key] = true
             } else {
                 disableInfo[key] = false
@@ -75,6 +98,8 @@ class BurgerBuilder extends Component {
                     addingredient={this.addIngredientHandler}
                     removeingredient={this.removeIngredientHandler}
                     disabled={disableInfo}
+                    price={this.state.totalPrice.toFixed(2)}
+                    purchasable={this.state.purchase}
                 />
             </Aux>
         )
